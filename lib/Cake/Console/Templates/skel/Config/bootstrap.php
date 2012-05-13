@@ -91,3 +91,18 @@ Configure::write('Dispatcher.filters', array(
 	'AssetDispatcher',
 	'CacheDispatcher'
 ));
+
+/**
+ * Configures default file logging options
+ */
+App::uses('CakeLog', 'Log');
+CakeLog::config('debug', array(
+	'engine' => 'FileLog',
+	'scopes' => array('notice', 'info', 'debug'),
+	'file' => 'debug',
+));
+CakeLog::config('error', array(
+	'engine' => 'FileLog',
+	'scopes' => array('error', 'warning'),
+	'file' => 'error',
+));

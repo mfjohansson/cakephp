@@ -2487,7 +2487,7 @@ class RouterTest extends CakeTestCase {
  */
 	public function testResourceMap() {
 		$default = Router::resourceMap();
-		$exepcted = array(
+		$expected = array(
 			array('action' => 'index',	'method' => 'GET',		'id' => false),
 			array('action' => 'view',	'method' => 'GET',		'id' => true),
 			array('action' => 'add',	'method' => 'POST',		'id' => false),
@@ -2495,7 +2495,7 @@ class RouterTest extends CakeTestCase {
 			array('action' => 'delete',	'method' => 'DELETE',	'id' => true),
 			array('action' => 'edit',	'method' => 'POST', 	'id' => true)
 		);
-		$this->assertEquals($default, $exepcted);
+		$this->assertEquals($default, $expected);
 
 		$custom = array(
 			array('action' => 'index',	'method' => 'GET',		'id' => false),
@@ -2590,4 +2590,49 @@ class RouterTest extends CakeTestCase {
 		Router::defaultRouteClass('NonExistentClass');
 	}
 
+/**
+ * Tests generating well-formed querystrings
+ *
+ * @return void
+ */
+	public function testQueryString() {
+		$result = Router::queryString(array('var' => 'foo bar'));
+		$expected = '?var=foo+bar';
+		$this->assertEquals($expected, $result);
+
+		$result = Router::queryString(false, array('some' => 'param', 'foo' => 'bar'));
+		$expected = '?some=param&foo=bar';
+		$this->assertEquals($expected, $result);
+
+		$existing = array('apple' => 'red', 'pear' => 'green');
+		$result = Router::queryString($existing, array('some' => 'param', 'foo' => 'bar'));
+		$expected = '?apple=red&pear=green&some=param&foo=bar';
+		$this->assertEquals($expected, $result);
+
+		$existing = 'apple=red&pear=green';
+		$result = Router::queryString($existing, array('some' => 'param', 'foo' => 'bar'));
+		$expected = '?apple=red&pear=green&some=param&foo=bar';
+		$this->assertEquals($expected, $result);
+
+		$existing = '?apple=red&pear=green';
+		$result = Router::queryString($existing, array('some' => 'param', 'foo' => 'bar'));
+		$expected = '?apple=red&pear=green&some=param&foo=bar';
+		$this->assertEquals($expected, $result);
+
+		$result = Router::queryString('apple=red&pear=green');
+		$expected = '?apple=red&pear=green';
+		$this->assertEquals($expected, $result);
+
+		$result = Router::queryString('foo=bar', array('php' => 'nut', 'jose' => 'zap'), true);
+		$expected = '?foo=bar&amp;php=nut&amp;jose=zap';
+		$this->assertEquals($expected, $result);
+
+		$result = Router::queryString('foo=bar&amp;', array('php' => 'nut', 'jose' => 'zap'), true);
+		$expected = '?foo=bar&amp;php=nut&amp;jose=zap';
+		$this->assertEquals($expected, $result);
+
+		$result = Router::queryString('foo=bar&', array('php' => 'nut', 'jose' => 'zap'));
+		$expected = '?foo=bar&php=nut&jose=zap';
+		$this->assertEquals($expected, $result);
+	}
 }

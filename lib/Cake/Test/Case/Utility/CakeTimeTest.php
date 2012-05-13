@@ -78,66 +78,111 @@ class CakeTimeTest extends CakeTestCase {
  */
 	public function testTimeAgoInWords() {
 		$result = $this->Time->timeAgoInWords('-1 week');
-		$this->assertEquals(date('l d/m, H:i', strtotime('-1 week')), $result);
+		$this->assertEquals('1 week ago', $result);		$this->assertEquals(date('l d/m, H:i', strtotime('-1 week')), $result);
 
 		$result = $this->Time->timeAgoInWords('+1 week');
 		$this->assertEquals('On ' . date('l d/m, H:i', strtotime('+1 week')), $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+4 months +2 weeks +3 days'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+4 months +2 weeks +3 days'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('4 months, 2 weeks, 3 days', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+4 months +2 weeks +2 days'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+4 months +2 weeks +2 days'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('4 months, 2 weeks, 2 days', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+4 months +2 weeks +1 day'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+4 months +2 weeks +1 day'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('4 months, 2 weeks, 1 day', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+3 months +2 weeks +1 day'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+3 months +2 weeks +1 day'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('3 months, 2 weeks, 1 day', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+3 months +2 weeks'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+3 months +2 weeks'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('3 months, 2 weeks', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+3 months +1 week +6 days'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+3 months +1 week +6 days'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('3 months, 1 week, 6 days', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 weeks +1 day'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 weeks +1 day'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('2 months, 2 weeks, 1 day', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 weeks'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 weeks'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('2 months, 2 weeks', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +1 week +6 days'), array('end' => '8 years'), true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +1 week +6 days'),
+			array('end' => '8 years')
+		);
 		$this->assertEquals('2 months, 1 week, 6 days', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+1 month +1 week +6 days'), array('end' => '8 years'), true);
-		$this->assertEquals('1 month, 1 week, 6 days', $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+8 years, +4 months +2 weeks +3 days'), array('end' => '1 years', 'element' => 'span'), true);
-		$expected = '<span title="'.strtotime('+8 years, +4 months +2 weeks +3 days').'" class="timeAgoInWords">on '.date('j/n/y', strtotime('+8 years, +4 months +2 weeks +3 days')).'</span>';
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-1 month -1 week -6 days'),
+			array('end' => '1 year', 'accuracy' => array('month' => 'month'))
+		);
+		$this->assertEquals('1 month ago', $result);
+
+		$timestamp = strtotime('-1 years -2 weeks -3 days');
+		$result = $this->Time->timeAgoInWords(
+			$timestamp,
+			array('accuracy' => array('year' => 'year'))
+		);
+		$expected = 'on ' . date('j/n/y', $timestamp);
 		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+2 weeks'), array('end' => '1 years', 'element' => 'div'), true);
-		$expected = '<div title="'.strtotime('+2 weeks').'" class="timeAgoInWords">2 weeks</div>';
-		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+8 years +4 months +2 weeks +3 days'), array('accuracy' => array('year' => 'year'), 'end' => '+10 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+8 years +4 months +2 weeks +3 days'),
+			array('accuracy' => array('year' => 'year'), 'end' => '+10 years')
+		);
 		$expected = '8 years';
 		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+8 years +4 months +2 weeks +3 days'), array('accuracy' => array('year' => 'month'), 'end' => '+10 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+8 years +4 months +2 weeks +3 days'),
+			array('accuracy' => array('year' => 'month'), 'end' => '+10 years')
+		);
 		$expected = '8 years, 4 months';
 		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+8 years +4 months +2 weeks +3 days'), array('accuracy' => array('year' => 'week'), 'end' => '+10 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+8 years +4 months +2 weeks +3 days'),
+			array('accuracy' => array('year' => 'week'), 'end' => '+10 years')
+		);
 		$expected = '8 years, 4 months, 2 weeks';
 		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+8 years +4 months +2 weeks +3 days'), array('accuracy' => array('year' => 'day'), 'end' => '+10 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+8 years +4 months +2 weeks +3 days'),
+			array('accuracy' => array('year' => 'day'), 'end' => '+10 years')
+		);
 		$expected = '8 years, 4 months, 2 weeks, 3 days';
 		$this->assertEquals($expected, $result);
-		
-		$result = $this->Time->timeAgoInWords(strtotime('+1 years +5 weeks'), array('accuracy' => array('year' => 'year'), 'end' => '+10 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+1 years +5 weeks'),
+			array('accuracy' => array('year' => 'year'), 'end' => '+10 years')
+		);
 		$expected = '1 year';
 		$this->assertEquals($expected, $result);
 
@@ -145,7 +190,7 @@ class CakeTimeTest extends CakeTestCase {
 			$seconds = round($i + ($i * $i));
 			$time = strtotime('+' . $seconds . ' seconds');
 			$result = $this->Time->timeAgoInWords($time);
-			
+
 			if ($time == time()) {
 				$expected = 'just now';
 				$this->assertEquals($expected, $result);
@@ -154,8 +199,11 @@ class CakeTimeTest extends CakeTestCase {
 				$this->assertEquals($expected, $result);
 			}
 		}
-		
-		$result = $this->Time->timeAgoInWords(strtotime('-2 years -5 months -2 days'), array('end' => '3 years'), true);
+
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-2 years -5 months -2 days'),
+			array('end' => '3 years')
+		);
 		$this->assertEquals('2 years, 5 months, 2 days ago', $result);
 
 		$result = $this->Time->timeAgoInWords('2007-9-25');
@@ -164,43 +212,82 @@ class CakeTimeTest extends CakeTestCase {
 		$result = $this->Time->timeAgoInWords('2007-9-25', 'Y-m-d');
 		$this->assertEquals('on 2007-09-25', $result);
 
-		$result = $this->Time->timeAgoInWords('2007-9-25', 'Y-m-d', true);
+		$result = $this->Time->timeAgoInWords('2007-9-25', 'Y-m-d');
 		$this->assertEquals('on 2007-09-25', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('-2 weeks -2 days'), 'Y-m-d', false);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-2 weeks -2 days'),
+			'Y-m-d'
+		);
 		$this->assertEquals('2 weeks, 2 days ago', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 weeks +2 days'), 'Y-m-d', true);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 weeks +2 days'),
+			'Y-m-d'
+		);
 		$this->assertRegExp('/^2 weeks, [1|2] day(s)?$/', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 days'), array('end' => '1 month'));
-		$this->assertEquals('on ' . date('j/n/y', strtotime('+2 months +2 days')), $result);
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 days'),
+			array('end' => '1 month')
+		);
+		$this->assertEquals(
+			'on ' . date('j/n/y', strtotime('+2 months +2 days')),
+			$result
+		);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 days'), array('end' => '3 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 days'),
+			array('end' => '3 month')
+		);
 		$this->assertRegExp('/2 months/', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +12 days'), array('end' => '3 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +12 days'),
+			array('end' => '3 month')
+		);
 		$this->assertRegExp('/2 months, 1 week/', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+3 months +5 days'), array('end' => '4 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+3 months +5 days'),
+			array('end' => '4 month')
+		);
 		$this->assertEquals('3 months, 5 days', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('-2 months -2 days'), array('end' => '3 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-2 months -2 days'),
+			array('end' => '3 month')
+		);
 		$this->assertEquals('2 months, 2 days ago', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('-2 months -2 days'), array('end' => '3 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-2 months -2 days'),
+			array('end' => '3 month')
+		);
 		$this->assertEquals('2 months, 2 days ago', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 days'), array('end' => '3 month'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 days'),
+			array('end' => '3 month')
+		);
 		$this->assertRegExp('/2 months/', $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('+2 months +2 days'), array('end' => '1 month', 'format' => 'Y-m-d'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('+2 months +2 days'),
+			array('end' => '1 month', 'format' => 'Y-m-d')
+		);
 		$this->assertEquals('on ' . date('Y-m-d', strtotime('+2 months +2 days')), $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('-2 months -2 days'), array('end' => '1 month', 'format' => 'Y-m-d'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-2 months -2 days'),
+			array('end' => '1 month', 'format' => 'Y-m-d')
+		);
 		$this->assertEquals('on ' . date('Y-m-d', strtotime('-2 months -2 days')), $result);
 
-		$result = $this->Time->timeAgoInWords(strtotime('-13 months -5 days'), array('end' => '2 years'));
+		$result = $this->Time->timeAgoInWords(
+			strtotime('-13 months -5 days'),
+			array('end' => '2 years')
+		);
 		$this->assertEquals('1 year, 1 month, 5 days ago', $result);
 	}
 
@@ -249,9 +336,16 @@ class CakeTimeTest extends CakeTestCase {
 
 		$time = time() - DAY;
 		$this->assertEquals('Yesterday, ' . date('H:i', $time), $this->Time->niceShort($time));
-		
+
 		$time = time() + DAY;
 		$this->assertEquals('Tomorrow, ' . date('H:i', $time), $this->Time->niceShort($time));
+
+		$oldTimezone = date_default_timezone_get();
+		date_default_timezone_set('Europe/London');
+
+		$result = $this->Time->niceShort('2005-01-15 10:00:00', new DateTimeZone('Europe/Brussels'));
+		$this->assertEqual('Jan 15th 2005, 11:00', $result);
+		date_default_timezone_set($oldTimezone);
 	}
 
 /**
@@ -530,7 +624,7 @@ class CakeTimeTest extends CakeTestCase {
 		$this->assertTrue($this->Time->wasWithinLast('1   ', '-1 minute'));
 		$this->assertTrue($this->Time->wasWithinLast('1   ', '-23 hours -59 minutes -59 seconds'));
 	}
-	
+
 /**
  * testWasWithinLast method
  *
@@ -574,7 +668,7 @@ class CakeTimeTest extends CakeTestCase {
 		$this->assertFalse($this->Time->isWithinNext('1   ', '-1 hour'));
 		$this->assertFalse($this->Time->isWithinNext('1   ', '-1 minute'));
 		$this->assertFalse($this->Time->isWithinNext('1   ', '-23 hours -59 minutes -59 seconds'));
-		
+
 		$this->assertTrue($this->Time->isWithinNext('7 days', '6 days, 23 hours, 59 minutes, 59 seconds'));
 		$this->assertFalse($this->Time->isWithinNext('7 days', '6 days, 23 hours, 59 minutes, 61 seconds'));
 	}

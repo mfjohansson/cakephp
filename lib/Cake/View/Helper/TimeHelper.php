@@ -343,6 +343,14 @@ class TimeHelper extends AppHelper {
 /**
  * @see CakeTime::timeAgoInWords()
  *
+ * ## Addition options
+ *
+ * - `element` - The element to wrap the formatted time in.
+ *   Has a few additional options:
+ *   - `tag` - The tag to use, defaults to 'span'.
+ *   - `class` - The classname to use, defaults to `time-ago-in-words`.
+ *   - `title` - Defaults to the $dateTime input.
+ *
  * @param string $dateTime Datetime string or Unix timestamp
  * @param array $options Default format if timestamp is used in $dateString
  * @return string Relative time string.
@@ -350,37 +358,33 @@ class TimeHelper extends AppHelper {
  */
 	public function timeAgoInWords($dateTime, $options = array()) {
 		$element = null;
-
 		$stringDate = '';
 
-		if (isset($options['element'])) {
-			$element_options = array(
+		if (is_array($options) && !empty($options['element'])) {
+			$element = array(
 				'tag' => 'span',
 				'class' => 'time-ago-in-words',
 				'title' => $dateTime
 			);
-			
-			if (is_array($options['element'])) {
-				$element = array_merge($element_options, $options['element']);
-			} else {
-				if ($options['element']) {
-					$element = $element_options;
-					$element['tag'] = $options['element'];
-				} else {
-					$element = null;
-				}
-			}
-		}
 
+			if (is_array($options['element'])) {
+				$element = array_merge($element, $options['element']);
+			} else {
+				$element['tag'] = $options['element'];
+			}
+			unset($options['element']);
+		}
 		$relativeDate = $this->_engine->timeAgoInWords($dateTime, $options);
 
-		// Apply HTML element
 		if ($element) {
-			$title = isset($element['title']) ? ' title="'.$element['title'].'"' : '';
-			$class = isset($element['class']) ? ' class="'.$element['class'].'"' : '';
-			$relativeDate = '<'.$element['tag'].$title.$class.'>'.$relativeDate.'</'.$element['tag'].'>';
+			$relativeDate = sprintf(
+				'<%s%s>%s</%s>',
+				$element['tag'],
+				$this->_parseAttributes($element, array('tag')),
+				$relativeDate,
+				$element['tag']
+			);
 		}
-
 		return $relativeDate;
 	}
 
@@ -397,7 +401,7 @@ class TimeHelper extends AppHelper {
 	public function wasWithinLast($timeInterval, $dateString, $timezone = null) {
 		return $this->_engine->wasWithinLast($timeInterval, $dateString, $timezone);
 	}
-        
+
 /**
  * @see CakeTime::isWithinLast()
  *
