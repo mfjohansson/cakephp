@@ -113,6 +113,31 @@ class Model extends Object implements CakeEventListener {
 	public $primaryKey = null;
 
 /**
+ * Field-by-field label. This will be the default label on model inputs. It can, for 
+ * example, be specified as below:
+ * 
+ * {{{
+ * public $label = array(
+ *     // 'field-name' => 'Label',
+ *     'id' => '#',
+ *     'title' => 'Title',
+ *     'content' => 'Article content',
+ * );
+ * }}}
+ * 
+ * Or like so, in the constructor for the model:
+ * 
+ * {{{
+ * function TestModel() {
+ *     $this->label['title'] = __('Title');
+ * }
+ * }}}
+ *
+ * @var array
+ */
+	public $label = null;
+
+/**
  * Field-by-field table metadata.
  *
  * @var array
@@ -1993,7 +2018,7 @@ class Model extends Object implements CakeEventListener {
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html#model-saveassociated-array-data-null-array-options-array
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html#model-saveall-array-data-null-array-options-array
  */
-	public function saveAll($data, $options = array()) {
+	public function saveAll($data = null, $options = array()) {
 		$options = array_merge(array('validate' => 'first'), $options);
 		if (Hash::numeric(array_keys($data))) {
 			if ($options['validate'] === 'only') {
@@ -2100,10 +2125,6 @@ class Model extends Object implements CakeEventListener {
  * - fieldList: Equivalent to the $fieldList parameter in Model::save()
  * - deep: If set to true, all associated data will be validated as well.
  *
- * Warning: This method could potentially change the passed argument `$data`,
- * If you do not want this to happen, make a copy of `$data` before passing it
- * to this method
- *
  * @param array $data Record data to validate. This should be a numerically-indexed array
  * @param array $options Options to use when validating record data (see above), See also $options of validates().
  * @return boolean True on success, or false on failure.
@@ -2111,15 +2132,14 @@ class Model extends Object implements CakeEventListener {
  *    Otherwise: array similar to the $data array passed, but values are set to true/false
  *    depending on whether each record validated successfully.
  */
-	public function validateMany(&$data, $options = array()) {
+	public function validateMany($data, $options = array()) {
 		$options = array_merge(array('atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = $return = array();
-		foreach ($data as $key => &$record) {
+		foreach ($data as $key => $record) {
 			if ($options['deep']) {
 				$validates = $this->validateAssociated($record, $options);
 			} else {
 				$validates = $this->create($record) && $this->validates($options);
-				$data[$key] = $this->data;
 			}
 			if ($validates === false || (is_array($validates) && in_array(false, $validates, true))) {
 				$validationErrors[$key] = $this->validationErrors;
@@ -2192,7 +2212,6 @@ class Model extends Object implements CakeEventListener {
 			$db = $this->getDataSource();
 			$transactionBegun = $db->begin();
 		}
-
 		$associations = $this->getAssociated();
 		$return = array();
 		$validates = true;
@@ -2305,17 +2324,13 @@ class Model extends Object implements CakeEventListener {
  * - fieldList: Equivalent to the $fieldList parameter in Model::save()
  * - deep: If set to true, not only directly associated data , but deeper nested associated data is validated as well.
  *
- * Warning: This method could potentially change the passed argument `$data`,
- * If you do not want this to happen, make a copy of `$data` before passing it
- * to this method
- *
  * @param array $data Record data to validate. This should be an array indexed by association name.
  * @param array $options Options to use when validating record data (see above), See also $options of validates().
  * @return array|boolean If atomic: True on success, or false on failure.
  *    Otherwise: array similar to the $data array passed, but values are set to true/false
  *    depending on whether each record validated successfully.
  */
-	public function validateAssociated(&$data, $options = array()) {
+	public function validateAssociated($data, $options = array()) {
 		$options = array_merge(array('atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = $return = array();
 		if (!($this->create($data) && $this->validates($options))) {
@@ -2324,18 +2339,8 @@ class Model extends Object implements CakeEventListener {
 		} else {
 			$return[$this->alias] = true;
 		}
-
-		if (empty($options['deep'])) {
-			$data = $this->data;
-		} else {
-			$modelData = $this->data;
-			$recordData = $modelData[$this->alias];
-			unset($modelData[$this->alias]);
-			$data = $modelData + array_merge($data, $recordData);
-		}
-
 		$associations = $this->getAssociated();
-		foreach ($data as $association => &$values) {
+		foreach ($data as $association => $values) {
 			$validates = true;
 			if (isset($associations[$association])) {
 				if (in_array($associations[$association], array('belongsTo', 'hasOne'))) {
@@ -3400,6 +3405,16 @@ class Model extends Object implements CakeEventListener {
  */
 	public function getAffectedRows() {
 		return $this->getDataSource()->lastAffected();
+	}
+
+/**
+ * Returns the label, if set, for the specified field.
+ *
+ * @param string $fieldName Field name to get label for
+ * @return string Label text
+ */
+	public function getLabelForField($fieldName, $default = null) {
+		return isset($this->label) && isset($this->label[$fieldName]) ? $this->label[$fieldName] : $default;
 	}
 
 /**
